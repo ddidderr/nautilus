@@ -1242,22 +1242,21 @@ make_button_data (NautilusPathBar *self,
             GValue values[G_N_ELEMENTS (relations)] = {
                 G_VALUE_INIT,
             };
-            GtkAccessible *labelled_by[1];
+            GList *labelled_by = NULL;
 
             button_data->label = gtk_label_new (NULL);
-            labelled_by[0] = GTK_ACCESSIBLE (button_data->label);
+            labelled_by = g_list_prepend (labelled_by, button_data->label);
             child = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 6);
             button_data->container = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 6);
             gtk_box_append (GTK_BOX (button_data->container), button_data->button);
 
-            g_value_init (&values[0], GTK_ACCESSIBLE_LIST);
-            g_value_take_boxed (&values[0],
-                                gtk_accessible_list_new_from_array (labelled_by,
-                                                                    G_N_ELEMENTS (labelled_by)));
+            gtk_accessible_relation_init_value (relations[0], &values[0]);
+            g_value_set_pointer (&values[0], labelled_by);
             gtk_accessible_update_relation_value (GTK_ACCESSIBLE (button_data->image),
                                                   G_N_ELEMENTS (relations),
                                                   relations,
                                                   values);
+            g_list_free (labelled_by);
             g_value_unset (&values[0]);
 
             gtk_box_append (GTK_BOX (child), button_data->image);
