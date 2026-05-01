@@ -1236,15 +1236,29 @@ make_button_data (NautilusPathBar *self,
         case COMPUTER_BUTTON:
         case BURN_BUTTON:
         {
+            GtkAccessibleRelation relations[] = {
+                GTK_ACCESSIBLE_RELATION_LABELLED_BY,
+            };
+            GValue values[G_N_ELEMENTS (relations)] = {
+                G_VALUE_INIT,
+            };
+            GtkAccessible *labelled_by[1];
+
             button_data->label = gtk_label_new (NULL);
+            labelled_by[0] = GTK_ACCESSIBLE (button_data->label);
             child = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 6);
             button_data->container = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 6);
             gtk_box_append (GTK_BOX (button_data->container), button_data->button);
 
-            gtk_accessible_update_relation (GTK_ACCESSIBLE (button_data->image),
-                                            GTK_ACCESSIBLE_RELATION_LABELLED_BY,
-                                            button_data->label, NULL,
-                                            -1);
+            g_value_init (&values[0], GTK_ACCESSIBLE_LIST);
+            g_value_take_boxed (&values[0],
+                                gtk_accessible_list_new_from_array (labelled_by,
+                                                                    G_N_ELEMENTS (labelled_by)));
+            gtk_accessible_update_relation_value (GTK_ACCESSIBLE (button_data->image),
+                                                  G_N_ELEMENTS (relations),
+                                                  relations,
+                                                  values);
+            g_value_unset (&values[0]);
 
             gtk_box_append (GTK_BOX (child), button_data->image);
             gtk_box_append (GTK_BOX (child), button_data->label);

@@ -127,26 +127,45 @@ get_type_buttons (NautilusSearchPopover *popover)
 static void
 toggle_active_button (GtkButton *button)
 {
+    GtkAccessibleState states[] = {
+        GTK_ACCESSIBLE_STATE_CHECKED,
+    };
+    GValue values[G_N_ELEMENTS (states)] = {
+        G_VALUE_INIT,
+    };
+    GtkAccessibleTristate checked_state;
+
     if (!gtk_widget_has_css_class (GTK_WIDGET (button), "accent"))
     {
         gtk_widget_add_css_class (GTK_WIDGET (button), "accent");
-        gtk_accessible_update_state (GTK_ACCESSIBLE (button),
-                                     GTK_ACCESSIBLE_STATE_CHECKED, GTK_ACCESSIBLE_TRISTATE_TRUE,
-                                     -1);
+        checked_state = GTK_ACCESSIBLE_TRISTATE_TRUE;
     }
     else
     {
         gtk_widget_remove_css_class (GTK_WIDGET (button), "accent");
-        gtk_accessible_update_state (GTK_ACCESSIBLE (button),
-                                     GTK_ACCESSIBLE_STATE_CHECKED, GTK_ACCESSIBLE_TRISTATE_FALSE,
-                                     -1);
+        checked_state = GTK_ACCESSIBLE_TRISTATE_FALSE;
     }
+
+    gtk_accessible_state_init_value (states[0], &values[0]);
+    g_value_set_enum (&values[0], checked_state);
+    gtk_accessible_update_state_value (GTK_ACCESSIBLE (button),
+                                       G_N_ELEMENTS (states),
+                                       states,
+                                       values);
+    g_value_unset (&values[0]);
 }
 
 static void
 set_active_type_button (GtkButton *button,
                         gboolean   active)
 {
+    GtkAccessibleState states[] = {
+        GTK_ACCESSIBLE_STATE_CHECKED,
+    };
+    GValue values[G_N_ELEMENTS (states)] = {
+        G_VALUE_INIT,
+    };
+
     if (active)
     {
         gtk_widget_add_css_class (GTK_WIDGET (button), "accent");
@@ -156,9 +175,15 @@ set_active_type_button (GtkButton *button,
         gtk_widget_remove_css_class (GTK_WIDGET (button), "accent");
     }
 
-    gtk_accessible_update_state (GTK_ACCESSIBLE (button),
-                                 GTK_ACCESSIBLE_STATE_CHECKED, active,
-                                 -1);
+    gtk_accessible_state_init_value (states[0], &values[0]);
+    g_value_set_enum (&values[0],
+                      active ? GTK_ACCESSIBLE_TRISTATE_TRUE
+                             : GTK_ACCESSIBLE_TRISTATE_FALSE);
+    gtk_accessible_update_state_value (GTK_ACCESSIBLE (button),
+                                       G_N_ELEMENTS (states),
+                                       states,
+                                       values);
+    g_value_unset (&values[0]);
 }
 
 static void

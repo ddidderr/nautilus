@@ -320,6 +320,14 @@ on_model_changed (NautilusNetworkView *self)
 static GtkListView *
 create_view_ui (NautilusNetworkView *self)
 {
+    GtkAccessibleProperty properties[] = {
+        GTK_ACCESSIBLE_PROPERTY_LABEL,
+        GTK_ACCESSIBLE_PROPERTY_ROLE_DESCRIPTION,
+    };
+    GValue values[G_N_ELEMENTS (properties)] = {
+        G_VALUE_INIT,
+        G_VALUE_INIT,
+    };
     g_autoptr (GtkListItemFactory) factory = gtk_signal_list_item_factory_new ();
     g_autoptr (GtkListItemFactory) header_factory = gtk_signal_list_item_factory_new ();
     GtkListView *list_view;
@@ -344,12 +352,16 @@ create_view_ui (NautilusNetworkView *self)
     gtk_list_view_set_enable_rubberband (list_view, FALSE);
     gtk_list_view_set_tab_behavior (list_view, GTK_LIST_TAB_ITEM);
 
-    gtk_accessible_update_property (GTK_ACCESSIBLE (list_view),
-                                    GTK_ACCESSIBLE_PROPERTY_LABEL,
-                                    _("Content View"),
-                                    GTK_ACCESSIBLE_PROPERTY_ROLE_DESCRIPTION,
-                                    _("View of the current location"),
-                                    -1);
+    gtk_accessible_property_init_value (properties[0], &values[0]);
+    g_value_set_string (&values[0], _("Content View"));
+    gtk_accessible_property_init_value (properties[1], &values[1]);
+    g_value_set_string (&values[1], _("View of the current location"));
+    gtk_accessible_update_property_value (GTK_ACCESSIBLE (list_view),
+                                          G_N_ELEMENTS (properties),
+                                          properties,
+                                          values);
+    g_value_unset (&values[0]);
+    g_value_unset (&values[1]);
 
     /* While we don't want to use GTK's click activation, we'll let it handle
      * the key activation part (with Enter). */

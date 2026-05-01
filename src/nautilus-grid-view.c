@@ -489,6 +489,14 @@ on_model_changed (NautilusGridView *self)
 static GtkGridView *
 create_view_ui (NautilusGridView *self)
 {
+    GtkAccessibleProperty properties[] = {
+        GTK_ACCESSIBLE_PROPERTY_LABEL,
+        GTK_ACCESSIBLE_PROPERTY_ROLE_DESCRIPTION,
+    };
+    GValue values[G_N_ELEMENTS (properties)] = {
+        G_VALUE_INIT,
+        G_VALUE_INIT,
+    };
     GtkListItemFactory *factory;
     GtkWidget *widget;
 
@@ -509,12 +517,16 @@ create_view_ui (NautilusGridView *self)
     gtk_grid_view_set_max_columns (GTK_GRID_VIEW (widget), 20);
     gtk_grid_view_set_tab_behavior (GTK_GRID_VIEW (widget), GTK_LIST_TAB_ITEM);
 
-    gtk_accessible_update_property (GTK_ACCESSIBLE (widget),
-                                    GTK_ACCESSIBLE_PROPERTY_LABEL,
-                                    _("Content View"),
-                                    GTK_ACCESSIBLE_PROPERTY_ROLE_DESCRIPTION,
-                                    _("View of the current location"),
-                                    -1);
+    gtk_accessible_property_init_value (properties[0], &values[0]);
+    g_value_set_string (&values[0], _("Content View"));
+    gtk_accessible_property_init_value (properties[1], &values[1]);
+    g_value_set_string (&values[1], _("View of the current location"));
+    gtk_accessible_update_property_value (GTK_ACCESSIBLE (widget),
+                                          G_N_ELEMENTS (properties),
+                                          properties,
+                                          values);
+    g_value_unset (&values[0]);
+    g_value_unset (&values[1]);
 
     /* While we don't want to use GTK's click activation, we'll let it handle
      * the key activation part (with Enter).

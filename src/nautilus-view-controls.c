@@ -63,6 +63,14 @@ on_tooltip_changed (NautilusViewControls *self,
                     GParamSpec           *param,
                     NautilusWindowSlot   *slot)
 {
+    GtkAccessibleProperty properties[] = {
+        GTK_ACCESSIBLE_PROPERTY_LABEL,
+        GTK_ACCESSIBLE_PROPERTY_DESCRIPTION,
+    };
+    GValue values[G_N_ELEMENTS (properties)] = {
+        G_VALUE_INIT,
+        G_VALUE_INIT,
+    };
     const gchar *description;
     const gchar *tooltip = nautilus_window_slot_get_tooltip_with_description (slot, &description);
 
@@ -70,12 +78,17 @@ on_tooltip_changed (NautilusViewControls *self,
     {
         return;
     }
-    gtk_accessible_update_property (GTK_ACCESSIBLE (self->view_split_button),
-                                    GTK_ACCESSIBLE_PROPERTY_LABEL,
-                                    tooltip,
-                                    GTK_ACCESSIBLE_PROPERTY_DESCRIPTION,
-                                    description,
-                                    -1);
+
+    gtk_accessible_property_init_value (properties[0], &values[0]);
+    g_value_set_string (&values[0], tooltip);
+    gtk_accessible_property_init_value (properties[1], &values[1]);
+    g_value_set_string (&values[1], description);
+    gtk_accessible_update_property_value (GTK_ACCESSIBLE (self->view_split_button),
+                                          G_N_ELEMENTS (properties),
+                                          properties,
+                                          values);
+    g_value_unset (&values[0]);
+    g_value_unset (&values[1]);
 }
 
 
