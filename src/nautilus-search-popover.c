@@ -165,20 +165,21 @@ set_active_type_button (GtkButton *button,
     GValue values[G_N_ELEMENTS (states)] = {
         G_VALUE_INIT,
     };
+    GtkAccessibleTristate checked_state;
 
     if (active)
     {
         gtk_widget_add_css_class (GTK_WIDGET (button), "accent");
+        checked_state = GTK_ACCESSIBLE_TRISTATE_TRUE;
     }
     else
     {
         gtk_widget_remove_css_class (GTK_WIDGET (button), "accent");
+        checked_state = GTK_ACCESSIBLE_TRISTATE_FALSE;
     }
 
     gtk_accessible_state_init_value (states[0], &values[0]);
-    g_value_set_enum (&values[0],
-                      active ? GTK_ACCESSIBLE_TRISTATE_TRUE
-                             : GTK_ACCESSIBLE_TRISTATE_FALSE);
+    g_value_set_enum (&values[0], checked_state);
     gtk_accessible_update_state_value (GTK_ACCESSIBLE (button),
                                        G_N_ELEMENTS (states),
                                        states,

@@ -1245,7 +1245,7 @@ make_button_data (NautilusPathBar *self,
             GList *labelled_by = NULL;
 
             button_data->label = gtk_label_new (NULL);
-            labelled_by = g_list_prepend (labelled_by, button_data->label);
+            labelled_by = g_list_prepend (labelled_by, GTK_ACCESSIBLE (button_data->label));
             child = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 6);
             button_data->container = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 6);
             gtk_box_append (GTK_BOX (button_data->container), button_data->button);
